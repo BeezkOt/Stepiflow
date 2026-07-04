@@ -1,6 +1,6 @@
-// StepFlow — Service Worker
+// StepiFlow — Service Worker
 // Incrémente ce numéro à chaque déploiement pour forcer la mise à jour du cache.
-const CACHE_VERSION = 'stepiflow-v1';
+const CACHE_VERSION = 'stepiflow-v2';
 
 const FILES_TO_CACHE = [
   './',
