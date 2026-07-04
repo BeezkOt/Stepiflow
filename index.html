@@ -937,7 +937,7 @@ async function saveState() {
     await idbSet(STATE_KEY, state);
   } catch (err) {
     console.error('Erreur de sauvegarde IndexedDB :', err);
-    showToast('⚠️ Erreur de sauvegarde');
+    showToast(t('saveError'));
   }
 }
 
@@ -948,25 +948,349 @@ function applyTheme(theme) {
   localStorage.setItem('stepiflow-theme', theme);
 }
 
+// ── LANGUE ──
+const TRANSLATIONS = {
+  fr: {
+    appTitle: 'Mes dossiers',
+    newFolder: 'Nom du nouveau dossier…',
+    createFolder: '+ Créer',
+    searchPlaceholder: 'Rechercher une liste…',
+    noFolder: 'Aucun dossier',
+    noFolderSub: 'Crée ton premier dossier ci-dessus',
+    noList: 'Aucune liste',
+    noListSub: 'Crée ta première liste avec le bouton ci-dessus',
+    newList: '+ Nouvelle liste',
+    newListTitle: 'Nouvelle liste',
+    editListTitle: 'Modifier la liste',
+    listTitleLabel: 'Titre de la liste',
+    listTitlePlaceholder: 'Ex : Régler les freins à disque',
+    tabPaste: '📋 Coller du texte',
+    tabManual: '✏️ Saisie manuelle',
+    pasteLabel: 'Colle ta liste ici',
+    pastePlaceholder: '1. Première étape\n2. Deuxième étape\n\nou\n\n- Première étape\n- Deuxième étape',
+    convertBtn: '→ Convertir en étapes',
+    previewLabel: 'Aperçu des étapes détectées :',
+    addStep: '+ Ajouter une étape',
+    saveBtn: '💾 Enregistrer',
+    cancelBtn: 'Annuler',
+    moveBtn: '📁 Déplacer dans un autre dossier',
+    deleteListBtn: '🗑️ Supprimer cette liste',
+    stepTitle: "Titre de l'étape",
+    stepDesc: 'Description (optionnelle)',
+    noSearchResult: 'Aucun résultat',
+    noSearchResultSub: "Essaie d'autres mots-clés",
+    noOtherFolder: 'Aucun autre dossier disponible.',
+    moveTo: 'Déplacer vers…',
+    renameFolder: 'Modifier le nom',
+    deleteFolder: 'Supprimer ce dossier',
+    menuTheme: 'Thème',
+    menuLang: 'Langue',
+    menuExport: 'Exporter mes données',
+    menuImport: 'Importer mes données',
+    exportHint: 'Exporte régulièrement tes données pour éviter de les perdre.',
+    importConfirm: 'Importer ce fichier remplacera toutes tes données actuelles. Continuer ?',
+    importSuccess: 'Données importées ✓',
+    importError: 'Fichier invalide ou corrompu',
+    exportSuccess: 'Données exportées ✓',
+    saved: 'Liste enregistrée ✓',
+    deleted: 'Liste supprimée',
+    moved: 'Liste déplacée ✓',
+    folderCreated: 'Dossier créé ✓',
+    folderRenamed: 'Dossier renommé ✓',
+    folderDeleted: 'Dossier supprimé',
+    deleteListConfirmTitle: (title) => `Supprimer « ${title} » ?`,
+    deleteListConfirmMsg: 'Cette liste et toutes ses étapes seront supprimées définitivement.',
+    deleteFolderConfirmTitle: (name) => `Supprimer « ${name} » ?`,
+    deleteFolderConfirmMsg: (count, name) => count > 0
+      ? `Ce dossier contient ${count} liste${count > 1 ? 's' : ''}. Elles seront supprimées définitivement.`
+      : `Le dossier « ${name} » sera supprimé définitivement.`,
+    deleteBtn: 'Supprimer',
+    stepLabel: (n) => `Étape ${n}`,
+    stepCount: (n, total) => `Étape ${n} / ${total}`,
+    done: 'Terminé !',
+    doneSub: 'Tu as complété toutes les étapes de',
+    backToLists: 'Retour aux listes',
+    nextStep: 'Étape suivante →',
+    finish: 'Terminer',
+    voiceNotSupported: 'Commande vocale non supportée sur ce navigateur',
+    voiceActive: 'Écoute active — dis "suivant" ou "retour"',
+    voiceOff: 'Micro désactivé',
+    voiceNext: '→ Étape suivante',
+    voicePrev: '← Étape précédente',
+    noStepInList: 'Aucune étape dans cette liste',
+    saveError: '⚠️ Erreur de sauvegarde',
+    stepsImported: (n) => `${n} étape${n > 1 ? 's' : ''} importée${n > 1 ? 's' : ''} ✓`,
+    noStepDetected: 'Aucune étape détectée…',
+    addTitle: 'Ajoute un titre !',
+    addOneStep: 'Ajoute au moins une étape !',
+    pasteFirst: 'Colle d\'abord du texte !',
+    listCount: (n) => `${n} liste${n !== 1 ? 's' : ''}`,
+    tapToEdit: 'Appuie pour modifier',
+    themeLabels: {
+      'theme-mixed': { label: 'Clair / Sombre', desc: 'Play en noir, reste en blanc' },
+      'theme-light': { label: 'Clair', desc: 'Tout en blanc' },
+      'theme-cream': { label: 'Crème', desc: 'Beige doux, textes brun' },
+      'theme-dark':  { label: 'Sombre', desc: 'Tout en gris très foncé' },
+    },
+    langLabel: 'Français',
+    renameInput: 'Nouveau nom…',
+    renameOk: 'OK',
+    micDisable: 'Désactiver le micro',
+    micEnable: 'Commande vocale',
+  },
+  en: {
+    appTitle: 'My folders',
+    newFolder: 'New folder name…',
+    createFolder: '+ Create',
+    searchPlaceholder: 'Search a list…',
+    noFolder: 'No folder',
+    noFolderSub: 'Create your first folder above',
+    noList: 'No list',
+    noListSub: 'Create your first list with the button above',
+    newList: '+ New list',
+    newListTitle: 'New list',
+    editListTitle: 'Edit list',
+    listTitleLabel: 'List title',
+    listTitlePlaceholder: 'E.g. : Adjust disc brakes',
+    tabPaste: '📋 Paste text',
+    tabManual: '✏️ Manual entry',
+    pasteLabel: 'Paste your list here',
+    pastePlaceholder: '1. First step\n2. Second step\n\nor\n\n- First step\n- Second step',
+    convertBtn: '→ Convert to steps',
+    previewLabel: 'Preview of detected steps:',
+    addStep: '+ Add a step',
+    saveBtn: '💾 Save',
+    cancelBtn: 'Cancel',
+    moveBtn: '📁 Move to another folder',
+    deleteListBtn: '🗑️ Delete this list',
+    stepTitle: 'Step title',
+    stepDesc: 'Description (optional)',
+    noSearchResult: 'No results',
+    noSearchResultSub: 'Try different keywords',
+    noOtherFolder: 'No other folder available.',
+    moveTo: 'Move to…',
+    renameFolder: 'Rename folder',
+    deleteFolder: 'Delete folder',
+    menuTheme: 'Theme',
+    menuLang: 'Language',
+    menuExport: 'Export my data',
+    menuImport: 'Import my data',
+    exportHint: 'Export your data regularly to avoid losing it.',
+    importConfirm: 'Importing this file will replace all your current data. Continue?',
+    importSuccess: 'Data imported ✓',
+    importError: 'Invalid or corrupted file',
+    exportSuccess: 'Data exported ✓',
+    saved: 'List saved ✓',
+    deleted: 'List deleted',
+    moved: 'List moved ✓',
+    folderCreated: 'Folder created ✓',
+    folderRenamed: 'Folder renamed ✓',
+    folderDeleted: 'Folder deleted',
+    deleteListConfirmTitle: (title) => `Delete « ${title} »?`,
+    deleteListConfirmMsg: 'This list and all its steps will be permanently deleted.',
+    deleteFolderConfirmTitle: (name) => `Delete « ${name} »?`,
+    deleteFolderConfirmMsg: (count, name) => count > 0
+      ? `This folder contains ${count} list${count > 1 ? 's' : ''}. They will be permanently deleted.`
+      : `The folder « ${name} » will be permanently deleted.`,
+    deleteBtn: 'Delete',
+    stepLabel: (n) => `Step ${n}`,
+    stepCount: (n, total) => `Step ${n} / ${total}`,
+    done: 'Done!',
+    doneSub: 'You completed all steps of',
+    backToLists: 'Back to lists',
+    nextStep: 'Next step →',
+    finish: 'Finish',
+    voiceNotSupported: 'Voice control not supported on this browser',
+    voiceActive: 'Listening — say "next" or "back"',
+    voiceOff: 'Microphone off',
+    voiceNext: '→ Next step',
+    voicePrev: '← Previous step',
+    noStepInList: 'No steps in this list',
+    saveError: '⚠️ Save error',
+    stepsImported: (n) => `${n} step${n > 1 ? 's' : ''} imported ✓`,
+    noStepDetected: 'No steps detected…',
+    addTitle: 'Add a title!',
+    addOneStep: 'Add at least one step!',
+    pasteFirst: 'Paste some text first!',
+    listCount: (n) => `${n} list${n !== 1 ? 's' : ''}`,
+    tapToEdit: 'Tap to edit',
+    themeLabels: {
+      'theme-mixed': { label: 'Light / Dark', desc: 'Play in dark, rest in light' },
+      'theme-light': { label: 'Light', desc: 'All white' },
+      'theme-cream': { label: 'Cream', desc: 'Soft beige, brown text' },
+      'theme-dark':  { label: 'Dark', desc: 'All dark grey' },
+    },
+    langLabel: 'English',
+    renameInput: 'New name…',
+    renameOk: 'OK',
+    micDisable: 'Turn off microphone',
+    micEnable: 'Voice control',
+  }
+};
+
+let currentLang = localStorage.getItem('stepiflow-lang') || 'fr';
+function t(key, ...args) {
+  const val = TRANSLATIONS[currentLang][key];
+  return typeof val === 'function' ? val(...args) : (val ?? key);
+}
+function applyLang(lang) {
+  currentLang = lang;
+  localStorage.setItem('stepiflow-lang', lang);
+  const L = TRANSLATIONS[lang];
+  // Champs et placeholders
+  const nf = document.getElementById('new-folder-name');
+  if (nf) nf.placeholder = L.newFolder;
+  const si = document.getElementById('search-input');
+  if (si) si.placeholder = L.searchPlaceholder;
+  // Bouton créer dossier
+  const cfBtn = document.querySelector('#screen-folders .add-folder-row .btn-primary');
+  if (cfBtn) cfBtn.textContent = L.createFolder;
+  // Bouton nouvelle liste
+  const nlBtn = document.querySelector('#screen-lists .btn-primary');
+  if (nlBtn) nlBtn.textContent = L.newList;
+  // Onglets
+  const tabs = document.querySelectorAll('#create-tabs .tab');
+  if (tabs[0]) tabs[0].textContent = L.tabPaste;
+  if (tabs[1]) tabs[1].textContent = L.tabManual;
+  // Labels champ titre liste
+  const ltLabel = document.querySelector('label[for="list-title-input"], .field-label');
+  // Convertir btn
+  const cvBtn = document.querySelector('#tab-paste .btn-secondary');
+  if (cvBtn) cvBtn.textContent = L.convertBtn;
+  // Ajouter étape btn
+  const asBtn = document.querySelector('.add-step-btn');
+  if (asBtn) asBtn.textContent = L.addStep;
+  // Boutons create-actions
+  const saveBtn = document.querySelector('.create-actions .btn-primary');
+  if (saveBtn) saveBtn.textContent = L.saveBtn;
+  const cancelBtn = document.querySelector('.create-actions .btn-ghost');
+  if (cancelBtn) cancelBtn.textContent = L.cancelBtn;
+  // Danger zone
+  const moveBtn = document.querySelector('#danger-zone .btn-secondary');
+  if (moveBtn) moveBtn.textContent = L.moveBtn;
+  const delBtn = document.querySelector('#danger-zone .btn-danger');
+  if (delBtn) delBtn.textContent = L.deleteListBtn;
+  // Confirm dialog bouton
+  const confirmOk = document.getElementById('confirm-ok');
+  if (confirmOk) confirmOk.textContent = L.deleteBtn;
+  // Titre page accueil
+  const homeTitle = document.querySelector('#screen-folders .screen-title');
+  if (homeTitle) homeTitle.textContent = L.appTitle;
+  // Re-render l'écran actif
+  const active = ['folders','lists','create'].find(s => document.getElementById('screen-'+s)?.classList.contains('active'));
+  if (active === 'folders') renderFolders();
+  else if (active === 'lists') renderLists();
+}
+
 function openAppMenu() {
-  const themes = [
-    { id: 'theme-mixed',  label: 'Clair / Sombre', desc: 'Play en noir, reste en blanc', dot: 'linear-gradient(135deg,#fff 50%,#1C1B18 50%)' },
-    { id: 'theme-light',  label: 'Clair', desc: 'Tout en blanc', dot: '#FFFFFF' },
-    { id: 'theme-cream',  label: 'Crème', desc: 'Beige doux, textes brun', dot: '#FAF7F2' },
-    { id: 'theme-dark',   label: 'Sombre', desc: 'Tout en gris très foncé', dot: '#1A1A1A' },
+  const themes = ['theme-mixed','theme-light','theme-cream','theme-dark'];
+  const langs = [
+    { id: 'fr', flag: '🇫🇷', label: 'Français' },
+    { id: 'en', flag: '🇬🇧', label: 'English' },
   ];
-  document.getElementById('sheet-title').textContent = 'Thème';
-  document.getElementById('sheet-body').innerHTML = themes.map(t => `
-    <div class="sheet-item ${currentTheme === t.id ? 'active-theme' : ''}" onclick="applyTheme('${t.id}'); closeSheet();">
-      <span class="sheet-item-icon">${currentTheme === t.id ? '✓' : '○'}</span>
+
+  document.getElementById('sheet-title').textContent = '';
+  document.getElementById('sheet-body').innerHTML = `
+    <!-- Thèmes -->
+    <div style="font-size:13px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;padding:0 4px 8px">${t('menuTheme')}</div>
+    ${themes.map(id => {
+      const info = t('themeLabels')[id];
+      const dots = {
+        'theme-mixed': 'linear-gradient(135deg,#fff 50%,#1C1B18 50%)',
+        'theme-light': '#FFFFFF',
+        'theme-cream': '#FAF7F2',
+        'theme-dark':  '#1A1A1A',
+      };
+      return `<div class="sheet-item ${currentTheme === id ? 'active-theme' : ''}" onclick="applyTheme('${id}'); closeSheet();">
+        <span class="sheet-item-icon">${currentTheme === id ? '✓' : '○'}</span>
+        <span>
+          <span style="font-weight:600">${info.label}</span>
+          <span style="font-size:12px;color:var(--muted);display:block">${info.desc}</span>
+        </span>
+        <span style="width:22px;height:22px;border-radius:50%;border:2px solid var(--border);background:${dots[id]};display:inline-block;flex-shrink:0;margin-left:auto"></span>
+      </div>`;
+    }).join('')}
+
+    <!-- Séparateur -->
+    <div style="height:1px;background:var(--border);margin:10px 0"></div>
+
+    <!-- Langue -->
+    <div style="font-size:13px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;padding:0 4px 8px">${t('menuLang')}</div>
+    ${langs.map(l => `
+      <div class="sheet-item ${currentLang === l.id ? 'active-theme' : ''}" onclick="applyLang('${l.id}'); closeSheet();">
+        <span class="sheet-item-icon">${l.flag}</span>
+        <span style="font-weight:600">${l.label}</span>
+        ${currentLang === l.id ? '<span style="margin-left:auto;color:var(--accent)">✓</span>' : ''}
+      </div>`).join('')}
+
+    <!-- Séparateur -->
+    <div style="height:1px;background:var(--border);margin:10px 0"></div>
+
+    <!-- Export / Import -->
+    <div style="font-size:13px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;padding:0 4px 8px">Données</div>
+    <div class="sheet-item" onclick="exportData(); closeSheet();">
+      <span class="sheet-item-icon">📤</span>
       <span>
-        <span style="font-weight:600">${t.label}</span>
-        <span style="font-size:12px;color:var(--muted);display:block">${t.desc}</span>
+        <span style="font-weight:600">${t('menuExport')}</span>
+        <span style="font-size:12px;color:var(--muted);display:block">${t('exportHint')}</span>
       </span>
-      <span style="width:22px;height:22px;border-radius:50%;border:2px solid var(--border);background:${t.dot};display:inline-block;flex-shrink:0;margin-left:auto"></span>
     </div>
-  `).join('');
+    <div class="sheet-item" onclick="triggerImport(); closeSheet();">
+      <span class="sheet-item-icon">📥</span>
+      <span style="font-weight:600">${t('menuImport')}</span>
+    </div>
+    <input type="file" id="import-file-input" accept=".json" style="display:none" onchange="importData(event)">
+  `;
   openSheet();
+}
+
+// ── EXPORT / IMPORT ──
+function exportData() {
+  const data = {
+    version: 1,
+    exportedAt: new Date().toISOString(),
+    folders: state.folders,
+    lists: state.lists,
+  };
+  const json = JSON.stringify(data, null, 2);
+  const blob = new Blob([json], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `stepiflow-backup-${new Date().toISOString().slice(0,10)}.json`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  showToast(t('exportSuccess'));
+}
+
+function triggerImport() {
+  document.getElementById('import-file-input').click();
+}
+
+async function importData(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  try {
+    const text = await file.text();
+    const data = JSON.parse(text);
+    if (!data.folders || !data.lists) throw new Error('Invalid format');
+    showConfirm(t('menuImport'), t('importConfirm'), async () => {
+      state.folders = data.folders;
+      state.lists = data.lists;
+      state.currentFolderId = null;
+      state.editingListId = null;
+      await saveState();
+      renderFolders();
+      showScreen('folders', 'backward');
+      showToast(t('importSuccess'));
+    });
+  } catch(e) {
+    showToast(t('importError'));
+  }
+  // Reset l'input pour pouvoir réimporter le même fichier
+  event.target.value = '';
 }
 
 // ── NAVIGATION ──
@@ -1082,7 +1406,7 @@ function openSearchResult(listId) {
 function renderFolders() {
   const el = document.getElementById('folders-list');
   if (state.folders.length === 0) {
-    el.innerHTML = `<div class="empty-state"><div class="empty-icon">📂</div><div class="empty-title">Aucun dossier</div><div class="empty-sub">Crée ton premier dossier ci-dessus</div></div>`;
+    el.innerHTML = `<div class="empty-state"><div class="empty-icon">📂</div><div class="empty-title">${t('noFolder')}</div><div class="empty-sub">${t('noFolderSub')}</div></div>`;
     return;
   }
   el.innerHTML = state.folders.map(f => {
@@ -1091,7 +1415,7 @@ function renderFolders() {
       <div class="folder-card-main" onclick="openFolder('${f.id}')">
         <div>
           <div class="folder-name">${escHtml(f.name)}</div>
-          <div class="folder-count">${count} liste${count !== 1 ? 's' : ''}</div>
+          <div class="folder-count">${t('listCount', count)}</div>
         </div>
       </div>
       <button class="dots-btn" onclick="openFolderMenu('${f.id}')">⋮</button>
@@ -1106,7 +1430,7 @@ function addFolder() {
   state.folders.push({ id: uid(), name });
   saveState(); input.value = '';
   renderFolders();
-  showToast('Dossier créé ✓');
+  showToast(t('folderCreated'));
 }
 
 function openFolder(folderId) {
@@ -1119,8 +1443,8 @@ function openFolderMenu(folderId) {
   const folder = state.folders.find(f => f.id === folderId);
   document.getElementById('sheet-title').textContent = folder.name;
   document.getElementById('sheet-body').innerHTML = `
-    <div class="sheet-item" onclick="startRenameFolder('${folderId}')"><span class="sheet-item-icon">✏️</span> Modifier le nom</div>
-    <div class="sheet-item danger" onclick="confirmDeleteFolder('${folderId}')"><span class="sheet-item-icon">🗑️</span> Supprimer ce dossier</div>
+    <div class="sheet-item" onclick="startRenameFolder('${folderId}')"><span class="sheet-item-icon">✏️</span> ${t('renameFolder')}</div>
+    <div class="sheet-item danger" onclick="confirmDeleteFolder('${folderId}')"><span class="sheet-item-icon">🗑️</span> ${t('deleteFolder')}</div>
   `;
   openSheet();
 }
@@ -1129,8 +1453,8 @@ function startRenameFolder(folderId) {
   const folder = state.folders.find(f => f.id === folderId);
   document.getElementById('sheet-body').innerHTML = `
     <div class="sheet-rename-row">
-      <input type="text" id="rename-input" value="${escHtml(folder.name)}" placeholder="Nouveau nom…" />
-      <button class="btn btn-primary" onclick="confirmRenameFolder('${folderId}')">OK</button>
+      <input type="text" id="rename-input" value="${escHtml(folder.name)}" placeholder="${t('renameInput')}" />
+      <button class="btn btn-primary" onclick="confirmRenameFolder('${folderId}')">${t('renameOk')}</button>
     </div>`;
   const inp = document.getElementById('rename-input');
   inp.focus(); inp.select();
@@ -1143,39 +1467,36 @@ function confirmRenameFolder(folderId) {
   const idx = state.folders.findIndex(f => f.id === folderId);
   if (idx !== -1) { state.folders[idx].name = val; saveState(); }
   closeSheet(); renderFolders();
-  showToast('Dossier renommé ✓');
+  showToast(t('folderRenamed'));
 }
 
 function confirmDeleteFolder(folderId) {
   closeSheet();
   const folder = state.folders.find(f => f.id === folderId);
   const count = state.lists.filter(l => l.folderId === folderId).length;
-  const msg = count > 0
-    ? `Ce dossier contient ${count} liste${count > 1 ? 's' : ''}. Elles seront supprimées définitivement.`
-    : `Le dossier « ${folder.name} » sera supprimé définitivement.`;
-  showConfirm(`Supprimer « ${folder.name} » ?`, msg, () => {
+  showConfirm(t('deleteFolderConfirmTitle', folder.name), t('deleteFolderConfirmMsg', count, folder.name), () => {
     state.lists = state.lists.filter(l => l.folderId !== folderId);
     state.folders = state.folders.filter(f => f.id !== folderId);
     saveState(); renderFolders();
-    showToast('Dossier supprimé');
+    showToast(t('folderDeleted'));
   });
 }
 
 // ── LISTES ──
 function renderLists() {
   const folder = state.folders.find(f => f.id === state.currentFolderId);
-  document.getElementById('lists-folder-title').textContent = folder?.name || 'Listes';
+  document.getElementById('lists-folder-title').textContent = folder?.name || '';
   const el = document.getElementById('lists-list');
   const lists = state.lists.filter(l => l.folderId === state.currentFolderId);
   if (lists.length === 0) {
-    el.innerHTML = `<div class="empty-state"><div class="empty-icon">📋</div><div class="empty-title">Aucune liste</div><div class="empty-sub">Crée ta première liste avec le bouton ci-dessus</div></div>`;
+    el.innerHTML = `<div class="empty-state"><div class="empty-icon">📋</div><div class="empty-title">${t('noList')}</div><div class="empty-sub">${t('noListSub')}</div></div>`;
     return;
   }
   el.innerHTML = lists.map(l => `
     <div class="list-card">
       <div class="list-card-main" onclick="editList('${l.id}')">
         <div class="list-title">${escHtml(l.title)}</div>
-        <div class="list-meta">${l.steps.length} étape${l.steps.length !== 1 ? 's' : ''} · Appuie pour modifier</div>
+        <div class="list-meta">${t('listCount', l.steps.length)} · ${t('tapToEdit')}</div>
       </div>
       <button class="list-play-btn" onclick="playList('${l.id}')">▶</button>
     </div>`).join('');
@@ -1187,7 +1508,7 @@ let activeTab = 'paste';
 function showCreate(listId = null) {
   state.editingListId = listId;
   const isEdit = !!listId;
-  document.getElementById('create-screen-title').textContent = isEdit ? 'Modifier la liste' : 'Nouvelle liste';
+  document.getElementById('create-screen-title').textContent = isEdit ? t('editListTitle') : t('newListTitle');
   document.getElementById('list-title-input').value = '';
   document.getElementById('paste-input').value = '';
   document.getElementById('steps-builder').innerHTML = '';
@@ -1217,9 +1538,9 @@ function addStep(title = '', desc = '', container = 'steps-builder') {
   div.className = 'step-item'; div.id = 'step-' + stepId; div.draggable = true;
   div.innerHTML = `
     <div class="drag-handle" title="Déplacer">⠿</div>
-    <div class="step-number">Étape</div>
-    <textarea class="step-title-field" placeholder="Titre de l'étape" rows="1">${escHtml(title)}</textarea>
-    <textarea class="step-desc-field" placeholder="Description (optionnelle)">${escHtml(desc)}</textarea>
+    <div class="step-number">${t('stepLabel', '')}</div>
+    <textarea class="step-title-field" placeholder="${t('stepTitle')}" rows="1">${escHtml(title)}</textarea>
+    <textarea class="step-desc-field" placeholder="${t('stepDesc')}">${escHtml(desc)}</textarea>
     <button class="step-remove" onclick="removeStep('${stepId}', '${container}')" title="Supprimer">✕</button>`;
   builder.appendChild(div);
   const tf = div.querySelector('.step-title-field');
@@ -1245,11 +1566,11 @@ function initDragStep(el, container) {
 }
 
 function removeStep(stepId, container) { document.getElementById('step-' + stepId)?.remove(); renumberSteps(container); }
-function renumberSteps(container) { Array.from(document.getElementById(container).children).forEach((el, i) => { const n = el.querySelector('.step-number'); if (n) n.textContent = 'Étape ' + (i + 1); }); }
+function renumberSteps(container) { Array.from(document.getElementById(container).children).forEach((el, i) => { const n = el.querySelector('.step-number'); if (n) n.textContent = t('stepLabel', i + 1); }); }
 
 function parseAndConvert() {
   const text = document.getElementById('paste-input').value.trim();
-  if (!text) { showToast('Colle d\'abord du texte !'); return; }
+  if (!text) { showToast(t('pasteFirst')); return; }
   const steps = [];
   text.split('\n').map(l => l.trim()).filter(Boolean).forEach(line => {
     const cleaned = line.replace(/^(\d+[\.\)]\s*|[-*•]\s*)/, '').trim();
@@ -1257,12 +1578,12 @@ function parseAndConvert() {
     const i = cleaned.search(/[.!?]\s+/);
     steps.push(i !== -1 && i < cleaned.length - 1 ? { title: cleaned.slice(0, i + 1).trim(), desc: cleaned.slice(i + 1).trim() } : { title: cleaned, desc: '' });
   });
-  if (steps.length === 0) { showToast('Aucune étape détectée…'); return; }
+  if (steps.length === 0) { showToast(t('noStepDetected')); return; }
   document.getElementById('paste-preview-steps').innerHTML = '';
   document.getElementById('paste-preview').style.display = 'block';
   document.getElementById('steps-builder').innerHTML = '';
   steps.forEach(s => { addStep(s.title, s.desc, 'paste-preview-steps'); addStep(s.title, s.desc, 'steps-builder'); });
-  showToast(steps.length + ' étapes importées ✓');
+  showToast(t('stepsImported', steps.length));
 }
 
 function collectSteps(container) {
@@ -1273,15 +1594,15 @@ function collectSteps(container) {
 
 function saveList() {
   const title = document.getElementById('list-title-input').value.trim();
-  if (!title) { showToast('Ajoute un titre !'); return; }
+  if (!title) { showToast(t('addTitle')); return; }
   let steps = activeTab === 'paste' ? (collectSteps('paste-preview-steps').length > 0 ? collectSteps('paste-preview-steps') : collectSteps('steps-builder')) : collectSteps('steps-builder');
-  if (steps.length === 0) { showToast('Ajoute au moins une étape !'); return; }
+  if (steps.length === 0) { showToast(t('addOneStep')); return; }
   if (state.editingListId) {
     const idx = state.lists.findIndex(l => l.id === state.editingListId);
     if (idx !== -1) { state.lists[idx].title = title; state.lists[idx].steps = steps; }
   } else { state.lists.push({ id: uid(), folderId: state.currentFolderId, title, steps }); }
   saveState(); renderLists(); showScreen('lists', 'backward');
-  showToast('Liste enregistrée ✓');
+  showToast(t('saved'));
 }
 
 function cancelCreate() { showScreen('lists', 'backward'); }
@@ -1289,10 +1610,10 @@ function cancelCreate() { showScreen('lists', 'backward'); }
 function deleteCurrentList() {
   const list = state.lists.find(l => l.id === state.editingListId);
   if (!list) return;
-  showConfirm(`Supprimer « ${list.title} » ?`, 'Cette liste et toutes ses étapes seront supprimées définitivement.', () => {
+  showConfirm(t('deleteListConfirmTitle', list.title), t('deleteListConfirmMsg'), () => {
     state.lists = state.lists.filter(l => l.id !== state.editingListId);
     saveState(); renderLists(); showScreen('lists', 'backward');
-    showToast('Liste supprimée');
+    showToast(t('deleted'));
   });
 }
 
@@ -1300,9 +1621,9 @@ function moveCurrentList() {
   const list = state.lists.find(l => l.id === state.editingListId);
   if (!list) return;
   const others = state.folders.filter(f => f.id !== list.folderId);
-  document.getElementById('sheet-title').textContent = 'Déplacer vers…';
+  document.getElementById('sheet-title').textContent = t('moveTo');
   document.getElementById('sheet-body').innerHTML = others.length === 0
-    ? `<p style="color:var(--muted);font-size:14px;padding:8px 0">Aucun autre dossier disponible.</p>`
+    ? `<p style="color:var(--muted);font-size:14px;padding:8px 0">${t('noOtherFolder')}</p>`
     : others.map(f => { const c = state.lists.filter(l => l.folderId === f.id).length; return `<div class="sheet-item" onclick="moveToFolder('${f.id}')"><span class="sheet-item-icon">📁</span>${escHtml(f.name)} <span style="color:var(--muted);font-size:13px">(${c})</span></div>`; }).join('');
   openSheet();
 }
@@ -1311,7 +1632,7 @@ function moveToFolder(folderId) {
   const idx = state.lists.findIndex(l => l.id === state.editingListId);
   if (idx !== -1) { state.lists[idx].folderId = folderId; state.currentFolderId = folderId; saveState(); }
   closeSheet(); renderLists(); showScreen('lists', 'backward');
-  showToast('Liste déplacée ✓');
+  showToast(t('moved'));
 }
 
 // ── PLAY ──
@@ -1319,7 +1640,7 @@ let playState = { list: null, stepIndex: 0 };
 
 function playList(id) {
   const list = state.lists.find(l => l.id === id);
-  if (!list || list.steps.length === 0) { showToast('Aucune étape dans cette liste'); return; }
+  if (!list || list.steps.length === 0) { showToast(t('noStepInList')); return; }
   playState = { list, stepIndex: 0 };
   renderPlay(); showScreen('play', 'forward');
 }
@@ -1348,10 +1669,10 @@ function renderPlay(direction = 'right') {
       <div class="play-done-icon">
         <svg viewBox="0 0 24 24" style="width:56px;height:56px;fill:var(--accent)"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
       </div>
-      <div class="play-done-title">Terminé !</div>
-      <div class="play-done-sub">Tu as complété toutes les étapes de<br><strong style="color:var(--play-text)">${escHtml(list.title)}</strong></div>
+      <div class="play-done-title">${t('done')}</div>
+      <div class="play-done-sub">${t('doneSub')}<br><strong style="color:var(--play-text)">${escHtml(list.title)}</strong></div>
     </div>${tapZonesHTML}`;
-    footer.innerHTML = `<button class="play-btn-next" onclick="closePlay()">Retour aux listes</button>`;
+    footer.innerHTML = `<button class="play-btn-next" onclick="closePlay()">${t('backToLists')}</button>`;
     if (leftArrow) leftArrow.disabled = true;
     if (rightArrow) rightArrow.disabled = true;
     updateMicBtn();
@@ -1360,7 +1681,7 @@ function renderPlay(direction = 'right') {
 
   const step = list.steps[stepIndex];
   body.innerHTML = `
-    <div class="play-step-count">Étape ${stepIndex + 1} / ${total}</div>
+    <div class="play-step-count">${t('stepCount', stepIndex + 1, total)}</div>
     <div class="play-step-title">${escHtml(step.title)}</div>
     ${step.desc ? `<div class="play-step-desc">${escHtml(step.desc)}</div>` : ''}
     ${tapZonesHTML}`;
@@ -1372,7 +1693,8 @@ function renderPlay(direction = 'right') {
   if (leftArrow) leftArrow.disabled = stepIndex === 0;
   if (rightArrow) rightArrow.disabled = false;
 
-  footer.innerHTML = `<button class="play-btn-next" onclick="nextStep()">${stepIndex === total - 1 ? '<svg viewBox="0 0 24 24" style="width:18px;height:18px;fill:white;vertical-align:middle;margin-right:6px"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>Terminer' : 'Étape suivante →'}</button>`;
+  const finishBtn = `<svg viewBox="0 0 24 24" style="width:18px;height:18px;fill:white;vertical-align:middle;margin-right:6px"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>${t('finish')}`;
+  footer.innerHTML = `<button class="play-btn-next" onclick="nextStep()">${stepIndex === total - 1 ? finishBtn : t('nextStep')}</button>`;
   updateMicBtn();
 }
 
@@ -1382,7 +1704,7 @@ let micActive = false;
 
 function toggleMic() {
   if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
-    showToast('Commande vocale non supportée sur ce navigateur');
+    showToast(t('voiceNotSupported'));
     return;
   }
   micActive ? stopMic() : startMic();
@@ -1391,35 +1713,34 @@ function toggleMic() {
 function startMic() {
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
   recognition = new SpeechRecognition();
-  recognition.lang = 'fr-FR';
+  recognition.lang = currentLang === 'fr' ? 'fr-FR' : 'en-GB';
   recognition.continuous = true;
   recognition.interimResults = false;
   recognition.onresult = e => {
-    const t = e.results[e.results.length - 1][0].transcript.trim().toLowerCase();
-    if (/suivant|next|suite|continue|après|avance/.test(t)) { nextStep(); showToast('→ Étape suivante'); }
-    if (/précédent|retour|avant|back|recule/.test(t))       { prevStep(); showToast('← Étape précédente'); }
+    const transcript = e.results[e.results.length - 1][0].transcript.trim().toLowerCase();
+    if (/suivant|next|suite|continue|après|avance/.test(transcript)) { nextStep(); showToast(t('voiceNext')); }
+    if (/précédent|retour|avant|back|recule/.test(transcript))       { prevStep(); showToast(t('voicePrev')); }
   };
   recognition.onerror = e => { if (e.error !== 'no-speech') { micActive = false; updateMicBtn(); } };
   recognition.onend   = () => { if (micActive) recognition.start(); };
   recognition.start();
   micActive = true;
   updateMicBtn();
-  showToast('Écoute active — dis "suivant" ou "retour"', true);
+  showToast(t('voiceActive'), true);
 }
 
 function stopMic() {
   micActive = false;
   if (recognition) { recognition.stop(); recognition = null; }
   updateMicBtn();
-  showToast('Micro désactivé', true);
+  showToast(t('voiceOff'), true);
 }
 
 function updateMicBtn() {
   const btn = document.getElementById('mic-btn');
   if (!btn) return;
   btn.classList.toggle('active', micActive);
-  btn.title = micActive ? 'Désactiver le micro' : 'Commande vocale';
-  // SVG reste toujours dans le header — pas d'emoji
+  btn.title = micActive ? t('micDisable') : t('micEnable');
 }
 
 function nextStep() { playState.stepIndex++; renderPlay('right'); }
@@ -1455,6 +1776,7 @@ function showToast(msg, useMicIcon = false) {
 applyTheme(currentTheme);
 (async function init() {
   await loadState();
+  applyLang(currentLang); // initialise les placeholders selon la langue
   renderFolders();
 })();
 document.getElementById('new-folder-name').addEventListener('keydown', e => { if (e.key === 'Enter') addFolder(); });
