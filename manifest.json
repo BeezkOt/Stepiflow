@@ -1,7 +1,7 @@
 {
-  "name": "StepFlow",
-  "short_name": "StepFlow",
-  "description": "Affiche tes listes d'instructions étape par étape, en plein écran.",
+  "name": "StepiFlow",
+  "short_name": "StepiFlow",
+  "description": "Turn any list of instructions into a full-screen guide with step-by-step navigation",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
