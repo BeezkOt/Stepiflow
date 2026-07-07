@@ -1,6 +1,6 @@
-// StepiFlow — Service Worker
+// StepFlow — Service Worker
 // Incrémente ce numéro à chaque déploiement pour forcer la mise à jour du cache.
-const CACHE_VERSION = 'stepiflow-v2';
+const CACHE_VERSION = 'stepiflow-v3';
 
 const FILES_TO_CACHE = [
   './',
@@ -15,7 +15,7 @@ self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_VERSION).then(cache => cache.addAll(FILES_TO_CACHE))
   );
-  self.skipWaiting();
+  // Ne pas activer automatiquement — attendre le signal de l'app
 });
 
 // Activation : supprime les anciens caches
@@ -49,4 +49,11 @@ self.addEventListener('fetch', event => {
       return cached || networkFetch;
     })
   );
+});
+
+// Reçoit le signal de l'app pour activer la nouvelle version
+self.addEventListener('message', event => {
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
 });
