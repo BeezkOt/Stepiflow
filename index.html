@@ -180,7 +180,7 @@
     font-weight: 700;
     letter-spacing: -0.5px;
     margin-bottom: 20px;
-    margin-top: 8px;
+    margin-top: 20px;
     display: flex;
     align-items: center;
     gap: 4px;
@@ -517,13 +517,148 @@
   .play-step-title { font-size: 28px; font-weight: 700; color: var(--play-text); line-height: 1.25; letter-spacing: -0.5px; margin-bottom: 16px; }
   .play-step-desc { font-size: 17px; color: var(--play-muted); line-height: 1.65; }
 
-  .play-footer { padding: 20px 28px 40px; }
-  .play-btn-next {
-    width: 100%; padding: 16px; background: var(--accent); color: white;
-    border: none; border-radius: var(--radius); font-size: 17px; font-weight: 700;
-    cursor: pointer; font-family: inherit; transition: background 0.15s;
+  .play-footer {
+    padding: 16px 28px 40px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
   }
-  .play-btn-next:hover { background: var(--accent-hover); }
+
+  /* Barre de navigation : flèche | micro+label | flèche */
+  .play-nav-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+  .play-nav-arrow {
+    background: none;
+    border: none;
+    color: rgba(255,255,255,0.35);
+    font-size: 40px;
+    cursor: pointer;
+    padding: 0 12px;
+    line-height: 1;
+    transition: color 0.15s, opacity 0.15s;
+    flex-shrink: 0;
+    min-width: 56px; /* réserve l'espace même quand désactivée */
+  }
+  .play-nav-arrow:hover { color: rgba(255,255,255,0.8); }
+  .play-nav-arrow:disabled { opacity: 0.1; pointer-events: none; }
+
+  /* Centre micro : icône + label empilés */
+  .play-mic-center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    flex: 1;
+    cursor: pointer;
+  }
+  .play-mic-btn {
+    background: none;
+    border: none;
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    padding: 0;
+    flex-shrink: 0;
+    color: rgba(255,255,255,0.35);
+    transition: color 0.2s;
+  }
+  .play-mic-btn:hover { color: rgba(255,255,255,0.8); }
+  .play-mic-btn svg { width: 24px; height: 24px; fill: currentColor; }
+  .play-mic-btn.active { color: #E74C3C; animation: pulse 1.5s infinite; }
+  @keyframes pulse {
+    0%, 100% { filter: drop-shadow(0 0 0px rgba(231,76,60,0)); }
+    50%       { filter: drop-shadow(0 0 6px rgba(231,76,60,0.7)); }
+  }
+  /* Label vocal sous le micro */
+  .play-voice-label {
+    font-size: 11px;
+    color: rgba(255,255,255,0.3);
+    text-align: center;
+    transition: color 0.2s;
+  }
+  .play-voice-label.active { color: #E74C3C; }
+
+  /* Bouton retour centré sur l'écran de fin */
+  .play-back-btn {
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: var(--radius);
+    padding: 14px 28px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    width: 100%;
+    text-align: center;
+  }
+
+  /* En paysage : masquer la nav-bar portrait, afficher micro centré */
+  @media (orientation: landscape) {
+    .play-nav-bar { display: none; }
+    .play-footer { align-items: center; padding-bottom: 20px; }
+    .play-landscape-mic { display: flex !important; }
+  }
+  /* play-landscape-mic et play-landscape-back : cachés en portrait */
+  .play-landscape-mic { display: none; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; }
+  .play-landscape-back-wrap { display: none; }
+  @media (orientation: landscape) {
+    .play-landscape-mic { display: flex !important; }
+    .play-landscape-back-wrap.show { display: block; }
+  }
+
+  /* TTS row dans le header play */
+  .play-tts-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    background: none;
+    border: none;
+    font-family: inherit;
+    padding: 0;
+    flex: 1;
+  }
+  .play-tts-btn {
+    background: none;
+    border: none;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    padding: 0;
+    flex-shrink: 0;
+    color: rgba(255,255,255,0.35);
+    transition: color 0.2s;
+  }
+  .play-tts-btn svg { width: 22px; height: 22px; fill: currentColor; }
+  .play-tts-label {
+    font-size: 12px;
+    color: rgba(255,255,255,0.35);
+    transition: color 0.2s;
+    text-align: left;
+  }
+  .play-tts-row.active .play-tts-btn,
+  .play-tts-row.active .play-tts-label { color: var(--accent); }
+
+  /* Icône check sur l'écran de fin : cachée en paysage pour économiser la hauteur */
+  /* Bouton retour dans play-done : caché en paysage (le wrapper paysage le remplace) */
+  @media (orientation: landscape) {
+    .play-nav-bar { display: none; }
+    .play-done-back { display: none; }
+    .play-done-icon { display: none; }
+    /* Footer paysage : micro d'abord, bouton retour en dessous */
+    .play-footer { flex-direction: column-reverse; }
+  }
   .play-done { text-align: center; }
   .play-done-icon { font-size: 56px; margin-bottom: 16px; }
   .play-done-title { font-size: 26px; font-weight: 700; color: var(--play-text); margin-bottom: 8px; }
@@ -629,6 +764,9 @@
     background: var(--surface); border-radius: 20px 20px 0 0;
     padding: 20px 16px 40px; width: 100%; max-width: 600px;
     box-shadow: 0 -4px 30px rgba(0,0,0,0.2); animation: slideUp 0.25s ease;
+    max-height: 80vh;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
   }
   @keyframes slideUp { from { transform: translateY(40px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
   .sheet-title { font-size: 13px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px; padding: 0 4px; }
@@ -715,6 +853,12 @@
   </div>
 </div>
 
+<!-- BANNIÈRE MISE À JOUR -->
+<div id="update-banner" style="display:none;position:fixed;top:0;left:0;right:0;z-index:500;background:var(--accent);color:white;padding:12px 16px;display:none;align-items:center;justify-content:space-between;gap:12px;font-size:14px;font-weight:600;box-shadow:0 2px 8px rgba(0,0,0,0.2);">
+  <span id="update-banner-text">🔄 Mise à jour disponible</span>
+  <button onclick="applyUpdate()" style="background:white;color:var(--accent);border:none;border-radius:6px;padding:6px 14px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;font-family:inherit;">Recharger</button>
+</div>
+
 <!-- SCREEN : DOSSIERS -->
 <div class="screen active" id="screen-folders">
   <div class="screen-title">Mes dossiers</div>
@@ -760,7 +904,7 @@
     <span id="create-screen-title">Nouvelle liste</span>
   </div>
   <div class="field-group">
-    <label class="field-label">Titre de la liste</label>
+    <label class="field-label" id="list-title-label">Titre de la liste</label>
     <input type="text" id="list-title-input" placeholder="Ex : Régler les freins à disque" />
   </div>
   <div class="tab-row" id="create-tabs">
@@ -769,7 +913,7 @@
   </div>
   <div class="tab-panel active" id="tab-paste">
     <div class="field-group">
-      <label class="field-label">Colle ta liste ici</label>
+      <label class="field-label" id="paste-label">Colle ta liste ici</label>
       <textarea id="paste-input" placeholder="1. Première étape&#10;2. Deuxième étape&#10;&#10;ou&#10;&#10;- Première étape&#10;- Deuxième étape"></textarea>
     </div>
     <button class="btn btn-secondary" onclick="parseAndConvert()" style="margin-bottom:16px">→ Convertir en étapes</button>
@@ -795,15 +939,21 @@
 <!-- SCREEN : PLAY (pas de header) -->
 <div class="screen" id="screen-play">
   <div class="play-header">
-    <button class="play-mic-btn" id="mic-btn" onclick="toggleMic()" title="Commande vocale">
-      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-        <path d="M12 1a4 4 0 0 1 4 4v6a4 4 0 0 1-8 0V5a4 4 0 0 1 4-4zm-6.5 9a.5.5 0 0 1 .5.5 6 6 0 0 0 12 0 .5.5 0 0 1 1 0 7 7 0 0 1-6.5 6.96V20h3a.5.5 0 0 1 0 1h-7a.5.5 0 0 1 0-1h3v-2.54A7 7 0 0 1 5 10.5a.5.5 0 0 1 .5-.5z"/>
-      </svg>
-    </button>
+    <!-- TTS à gauche -->
+    <div class="play-tts-row" id="tts-row" onclick="cycleTts()">
+      <button class="play-tts-btn" id="tts-btn">
+        <svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
+      </button>
+      <span class="play-tts-label" id="tts-label"></span>
+    </div>
+    <!-- Croix à droite -->
     <button class="play-close" onclick="closePlay()">✕</button>
   </div>
+
   <div class="play-progress-dots" id="play-progress-dots"></div>
+
   <div class="play-body-wrap">
+    <!-- Grandes flèches paysage -->
     <button class="play-arrow" id="play-arrow-left" onclick="prevStep()">‹</button>
     <div class="play-body" id="play-body" style="position:relative;touch-action:pan-y;">
       <div class="play-tap-zones">
@@ -813,7 +963,30 @@
     </div>
     <button class="play-arrow" id="play-arrow-right" onclick="nextStep()">›</button>
   </div>
-  <div class="play-footer" id="play-footer"></div>
+
+  <div class="play-footer" id="play-footer">
+    <!-- Barre nav portrait : flèche | micro+label | flèche -->
+    <div class="play-nav-bar" id="play-nav-bar">
+      <button class="play-nav-arrow" id="play-nav-prev" onclick="prevStep()">‹</button>
+      <div class="play-mic-center" onclick="toggleMic()">
+        <button class="play-mic-btn" id="mic-btn">
+          <svg viewBox="0 0 24 24"><path d="M12 1a4 4 0 0 1 4 4v6a4 4 0 0 1-8 0V5a4 4 0 0 1 4-4zm-6.5 9a.5.5 0 0 1 .5.5 6 6 0 0 0 12 0 .5.5 0 0 1 1 0 7 7 0 0 1-6.5 6.96V20h3a.5.5 0 0 1 0 1h-7a.5.5 0 0 1 0-1h3v-2.54A7 7 0 0 1 5 10.5a.5.5 0 0 1 .5-.5z"/></svg>
+        </button>
+        <span class="play-voice-label" id="voice-label"></span>
+      </div>
+      <button class="play-nav-arrow" id="play-nav-next" onclick="nextStep()">›</button>
+    </div>
+    <!-- Éléments paysage : micro centré + bouton retour fin -->
+    <div class="play-landscape-mic" id="play-landscape-mic" onclick="toggleMic()">
+      <button class="play-mic-btn" id="mic-btn-landscape">
+        <svg viewBox="0 0 24 24"><path d="M12 1a4 4 0 0 1 4 4v6a4 4 0 0 1-8 0V5a4 4 0 0 1 4-4zm-6.5 9a.5.5 0 0 1 .5.5 6 6 0 0 0 12 0 .5.5 0 0 1 1 0 7 7 0 0 1-6.5 6.96V20h3a.5.5 0 0 1 0 1h-7a.5.5 0 0 1 0-1h3v-2.54A7 7 0 0 1 5 10.5a.5.5 0 0 1 .5-.5z"/></svg>
+      </button>
+      <span class="play-voice-label" id="voice-label-landscape"></span>
+    </div>
+    <div class="play-landscape-back-wrap" id="play-landscape-back-wrap">
+      <button class="play-back-btn" id="play-landscape-back" onclick="closePlay()"></button>
+    </div>
+  </div>
 </div>
 
 <!-- BOTTOM SHEET -->
@@ -821,7 +994,7 @@
   <div class="sheet">
     <div class="sheet-title" id="sheet-title"></div>
     <div id="sheet-body"></div>
-    <button class="sheet-cancel" onclick="closeSheet()">Annuler</button>
+    <button class="sheet-cancel" id="sheet-cancel-btn" onclick="closeSheet()">Annuler</button>
   </div>
 </div>
 
@@ -908,36 +1081,44 @@ async function loadState() {
         try { state = JSON.parse(legacy); } catch(e) {}
       }
     }
-
-    if (!state.folders || state.folders.length === 0) {
-      state.folders = [{ id: uid(), name: '🚲 Vélo' }, { id: uid(), name: '🍳 Recettes' }];
-      state.lists = [{
-        id: uid(), folderId: state.folders[0].id, title: 'Régler les freins à disque',
-        steps: [
-          { title: 'Vérifier l\'usure des plaquettes', desc: 'Retire la roue et inspecte les plaquettes. L\'épaisseur minimale est de 1 mm.' },
-          { title: 'Positionner l\'étrier', desc: 'Desserre les vis de l\'étrier et centre-le sur le disque. Ne pas serrer encore.' },
-          { title: 'Tirer le levier de frein', desc: 'Tire le levier fort et maintiens-le pendant que tu resserre les vis de l\'étrier.' },
-          { title: 'Vérifier le centrage', desc: 'Fais tourner la roue. Le disque ne doit pas frotter. Ajuste si nécessaire.' },
-        ]
-      }];
-      await saveState();
-    }
   } catch (err) {
-    console.error('Erreur IndexedDB, repli sur données par défaut :', err);
-    if (!state.folders.length) {
-      state.folders = [{ id: uid(), name: '🚲 Vélo' }, { id: uid(), name: '🍳 Recettes' }];
-      state.lists = [];
+    // IndexedDB indisponible (contexte sandboxé, navigateur privé…) → fallback localStorage
+    console.warn('IndexedDB indisponible, utilisation du localStorage :', err);
+    db = null;
+    const legacy = localStorage.getItem('stepiflow-data');
+    if (legacy) {
+      try { state = JSON.parse(legacy); } catch(e) {}
     }
+  }
+
+  // Données de démo si rien de chargé
+  if (!state.folders || state.folders.length === 0) {
+    state.folders = [{ id: uid(), name: '🚲 Vélo' }, { id: uid(), name: '🍳 Recettes' }];
+    state.lists = [{
+      id: uid(), folderId: state.folders[0].id, title: 'Régler les freins à disque',
+      steps: [
+        { title: 'Vérifier l\'usure des plaquettes', desc: 'Retire la roue et inspecte les plaquettes. L\'épaisseur minimale est de 1 mm.' },
+        { title: 'Positionner l\'étrier', desc: 'Desserre les vis de l\'étrier et centre-le sur le disque. Ne pas serrer encore.' },
+        { title: 'Tirer le levier de frein', desc: 'Tire le levier fort et maintiens-le pendant que tu resserre les vis de l\'étrier.' },
+        { title: 'Vérifier le centrage', desc: 'Fais tourner la roue. Le disque ne doit pas frotter. Ajuste si nécessaire.' },
+      ]
+    }];
+    await saveState();
   }
 }
 
 async function saveState() {
   try {
-    if (!db) db = await openDB();
-    await idbSet(STATE_KEY, state);
+    if (db) {
+      await idbSet(STATE_KEY, state);
+    } else {
+      // Fallback localStorage si IndexedDB indisponible
+      localStorage.setItem('stepiflow-data', JSON.stringify(state));
+    }
   } catch (err) {
-    console.error('Erreur de sauvegarde IndexedDB :', err);
-    showToast(t('saveError'));
+    console.error('Erreur de sauvegarde :', err);
+    // Dernier recours : localStorage
+    try { localStorage.setItem('stepiflow-data', JSON.stringify(state)); } catch(e) {}
   }
 }
 
@@ -1037,6 +1218,16 @@ const TRANSLATIONS = {
     renameOk: 'OK',
     micDisable: 'Désactiver le micro',
     micEnable: 'Commande vocale',
+    exportInfoTitle: 'Exporter mes données',
+    exportInfoMsg: "Un fichier contenant tous tes dossiers et listes va être téléchargé. Sur iPhone, appuie sur l'icône de partage ↑ puis \"Enregistrer dans Fichiers\" pour le sauvegarder. Garde-le précieusement : il te servira à restaurer tes données si besoin.",
+    exportInfoBtn: 'Télécharger le fichier',
+    updateAvailable: '🔄 Mise à jour disponible',
+    updateReload: 'Recharger',
+    voiceLabelOff: 'Commandes vocales',
+    voiceLabelOn: 'Commandes vocales',
+    ttsOff: 'Lecture audio désactivée',
+    ttsTitleOnly: 'Lecture audio du titre uniquement',
+    ttsTitleDesc: 'Lecture audio du titre et de la description',
   },
   en: {
     appTitle: 'My folders',
@@ -1125,6 +1316,16 @@ const TRANSLATIONS = {
     renameOk: 'OK',
     micDisable: 'Turn off microphone',
     micEnable: 'Voice control',
+    exportInfoTitle: 'Export my data',
+    exportInfoMsg: 'A file containing all your folders and lists will be downloaded. On iPhone, tap the share icon ↑ then "Save to Files" to keep it safe. Store it carefully: you\'ll need it to restore your data if something goes wrong.',
+    exportInfoBtn: 'Download file',
+    updateAvailable: '🔄 An update is available',
+    updateReload: 'Reload',
+    voiceLabelOff: 'Voice commands',
+    voiceLabelOn: 'Voice commands',
+    ttsOff: 'Audio reading off',
+    ttsTitleOnly: 'Reading title only',
+    ttsTitleDesc: 'Reading title and description',
   }
 };
 
@@ -1170,9 +1371,23 @@ function applyLang(lang) {
   if (moveBtn) moveBtn.textContent = L.moveBtn;
   const delBtn = document.querySelector('#danger-zone .btn-danger');
   if (delBtn) delBtn.textContent = L.deleteListBtn;
-  // Confirm dialog bouton
+  // Champs screen-create
+  const listTitleLabel = document.getElementById('list-title-label');
+  if (listTitleLabel) listTitleLabel.textContent = L.listTitleLabel;
+  const listTitleInput = document.getElementById('list-title-input');
+  if (listTitleInput) listTitleInput.placeholder = L.listTitlePlaceholder;
+  const pasteLabel = document.getElementById('paste-label');
+  if (pasteLabel) pasteLabel.textContent = L.pasteLabel;
+  const pasteInput = document.getElementById('paste-input');
+  if (pasteInput) pasteInput.placeholder = L.pastePlaceholder;
+  // Confirm dialog
+  const confirmCancel = document.querySelector('.confirm-actions .btn-ghost');
+  if (confirmCancel) confirmCancel.textContent = L.cancelBtn;
   const confirmOk = document.getElementById('confirm-ok');
   if (confirmOk) confirmOk.textContent = L.deleteBtn;
+  // Sheet cancel
+  const sheetCancel = document.getElementById('sheet-cancel-btn');
+  if (sheetCancel) sheetCancel.textContent = L.cancelBtn;
   // Titre page accueil
   const homeTitle = document.querySelector('#screen-folders .screen-title');
   if (homeTitle) homeTitle.textContent = L.appTitle;
@@ -1244,8 +1459,47 @@ function openAppMenu() {
   openSheet();
 }
 
-// ── EXPORT / IMPORT ──
+// ── TTS (VOICEOVER) ──
+// ttsMode : 0 = off, 1 = titre seulement, 2 = titre + description
+let ttsMode = 0;
+
+function cycleTts() {
+  ttsMode = (ttsMode + 1) % 3;
+  updateTtsBtn();
+  if (ttsMode > 0) speakCurrentStep();
+  else speechSynthesis.cancel();
+}
+
+function updateTtsBtn() {
+  const row = document.getElementById('tts-row');
+  const label = document.getElementById('tts-label');
+  if (!row || !label) return;
+  const labels = [t('ttsOff'), t('ttsTitleOnly'), t('ttsTitleDesc')];
+  label.textContent = labels[ttsMode];
+  row.classList.toggle('active', ttsMode > 0);
+}
+
+function speakCurrentStep() {
+  if (ttsMode === 0) return;
+  if (!('speechSynthesis' in window)) return;
+  speechSynthesis.cancel();
+  const { list, stepIndex } = playState;
+  if (!list || stepIndex >= list.steps.length) return;
+  const step = list.steps[stepIndex];
+  const text = ttsMode === 1
+    ? step.title
+    : step.title + (step.desc ? '. ' + step.desc : '');
+  const utt = new SpeechSynthesisUtterance(text);
+  utt.lang = currentLang === 'fr' ? 'fr-FR' : 'en-GB';
+  utt.rate = 0.95;
+  speechSynthesis.speak(utt);
+}
 function exportData() {
+  // Afficher d'abord le message d'explication, puis télécharger si confirmé
+  showConfirm(t('exportInfoTitle'), t('exportInfoMsg'), doExport, t('exportInfoBtn'), 'btn-primary');
+}
+
+function doExport() {
   const data = {
     version: 1,
     exportedAt: new Date().toISOString(),
@@ -1649,6 +1903,7 @@ function renderPlay(direction = 'right') {
   const { list, stepIndex } = playState;
   const total = list.steps.length;
 
+  // Dots
   document.getElementById('play-progress-dots').innerHTML = list.steps.map((_, i) => {
     const cls = i < stepIndex ? 'done' : (i === stepIndex ? 'current' : '');
     return `<div class="play-progress-dot ${cls}"></div>`;
@@ -1656,8 +1911,13 @@ function renderPlay(direction = 'right') {
 
   const body = document.getElementById('play-body');
   const footer = document.getElementById('play-footer');
+  // Flèches paysage
   const leftArrow = document.getElementById('play-arrow-left');
   const rightArrow = document.getElementById('play-arrow-right');
+  // Flèches portrait (nav-bar)
+  const navPrev = document.getElementById('play-nav-prev');
+  const navNext = document.getElementById('play-nav-next');
+  const navBar  = document.getElementById('play-nav-bar');
 
   const tapZonesHTML = `<div class="play-tap-zones">
     <div class="play-tap-zone play-tap-zone-left" onclick="prevStep()">‹</div>
@@ -1671,11 +1931,22 @@ function renderPlay(direction = 'right') {
       </div>
       <div class="play-done-title">${t('done')}</div>
       <div class="play-done-sub">${t('doneSub')}<br><strong style="color:var(--play-text)">${escHtml(list.title)}</strong></div>
-    </div>${tapZonesHTML}`;
-    footer.innerHTML = `<button class="play-btn-next" onclick="closePlay()">${t('backToLists')}</button>`;
+      <button class="play-back-btn play-done-back" onclick="closePlay()" style="margin-top:28px">${t('backToLists')}</button>
+    </div>`;
+    // Portrait : masquer les deux flèches, garder le micro seul centré
+    const navPrevEl = document.getElementById('play-nav-prev');
+    const navNextEl = document.getElementById('play-nav-next');
+    if (navPrevEl) navPrevEl.style.visibility = 'hidden';
+    if (navNextEl) navNextEl.style.visibility = 'hidden';
+    // Grandes flèches paysage
     if (leftArrow) leftArrow.disabled = true;
     if (rightArrow) rightArrow.disabled = true;
-    updateMicBtn();
+    // Bouton retour paysage — visible seulement en paysage via CSS
+    const lsBack = document.getElementById('play-landscape-back');
+    const lsWrap = document.getElementById('play-landscape-back-wrap');
+    if (lsBack) lsBack.textContent = t('backToLists');
+    if (lsWrap) lsWrap.classList.add('show');
+    updateMicBtn(); updateTtsBtn();
     return;
   }
 
@@ -1690,12 +1961,30 @@ function renderPlay(direction = 'right') {
   void body.offsetWidth;
   body.classList.add(direction === 'right' ? 'step-in-right' : 'step-in-left');
 
+  // Flèches paysage
   if (leftArrow) leftArrow.disabled = stepIndex === 0;
   if (rightArrow) rightArrow.disabled = false;
 
-  const finishBtn = `<svg viewBox="0 0 24 24" style="width:18px;height:18px;fill:white;vertical-align:middle;margin-right:6px"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>${t('finish')}`;
-  footer.innerHTML = `<button class="play-btn-next" onclick="nextStep()">${stepIndex === total - 1 ? finishBtn : t('nextStep')}</button>`;
+  // Flèches portrait — rétablir la visibilité
+  if (navPrev) { navPrev.style.visibility = ''; navPrev.disabled = stepIndex === 0; }
+  if (navNext) {
+    navNext.style.visibility = '';
+    if (stepIndex === total - 1) {
+      navNext.innerHTML = `<svg viewBox="0 0 24 24" style="width:28px;height:28px;fill:var(--accent)"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>`;
+      navNext.onclick = () => { playState.stepIndex++; renderPlay('right'); };
+    } else {
+      navNext.innerHTML = '›';
+      navNext.onclick = nextStep;
+    }
+    navNext.disabled = false;
+  }
+  // Cacher le bouton retour paysage sur les étapes normales
+  const lsBack = document.getElementById('play-landscape-back-wrap');
+  if (lsBack) lsBack.classList.remove('show');
+
   updateMicBtn();
+  updateTtsBtn();
+  speakCurrentStep();
 }
 
 // ── VOCAL ──
@@ -1737,15 +2026,28 @@ function stopMic() {
 }
 
 function updateMicBtn() {
+  const labelText = micActive ? t('voiceLabelOn') : t('voiceLabelOff');
+  // Portrait
   const btn = document.getElementById('mic-btn');
-  if (!btn) return;
-  btn.classList.toggle('active', micActive);
-  btn.title = micActive ? t('micDisable') : t('micEnable');
+  const label = document.getElementById('voice-label');
+  if (btn) { btn.classList.toggle('active', micActive); btn.title = micActive ? t('micDisable') : t('micEnable'); }
+  if (label) { label.textContent = labelText; label.classList.toggle('active', micActive); }
+  // Paysage
+  const btnL = document.getElementById('mic-btn-landscape');
+  const labelL = document.getElementById('voice-label-landscape');
+  if (btnL) { btnL.classList.toggle('active', micActive); }
+  if (labelL) { labelL.textContent = labelText; labelL.classList.toggle('active', micActive); }
 }
 
 function nextStep() { playState.stepIndex++; renderPlay('right'); }
 function prevStep() { if (playState.stepIndex > 0) { playState.stepIndex--; renderPlay('left'); } }
-function closePlay() { stopMic(); renderLists(); showScreen('lists', 'backward'); }
+function closePlay() {
+  stopMic();
+  if ('speechSynthesis' in window) speechSynthesis.cancel();
+  ttsMode = 0;
+  renderLists();
+  showScreen('lists', 'backward');
+}
 
 // ── SHEET ──
 function openSheet() { document.getElementById('sheet-overlay').classList.add('active'); }
@@ -1753,12 +2055,16 @@ function closeSheet(e) { if (!e || e.target === document.getElementById('sheet-o
 
 // ── CONFIRM ──
 let confirmCb = null;
-function showConfirm(title, msg, onOk) {
+function showConfirm(title, msg, onOk, okLabel, okClass) {
   document.getElementById('confirm-title').textContent = title;
   document.getElementById('confirm-msg').textContent = msg;
+  const btn = document.getElementById('confirm-ok');
+  btn.textContent = okLabel || t('deleteBtn');
+  btn.className = 'btn ' + (okClass || 'btn-danger');
+  btn.style.flex = '1';
   confirmCb = onOk;
   document.getElementById('confirm-overlay').classList.add('active');
-  document.getElementById('confirm-ok').onclick = () => { closeConfirm(); if (confirmCb) confirmCb(); };
+  btn.onclick = () => { closeConfirm(); if (confirmCb) confirmCb(); };
 }
 function closeConfirm() { document.getElementById('confirm-overlay').classList.remove('active'); }
 
@@ -1776,16 +2082,55 @@ function showToast(msg, useMicIcon = false) {
 applyTheme(currentTheme);
 (async function init() {
   await loadState();
-  applyLang(currentLang); // initialise les placeholders selon la langue
-  renderFolders();
+  const h = document.getElementById('app-header').offsetHeight;
+  document.querySelectorAll('.screen:not(#screen-play)').forEach(s => {
+    s.style.paddingTop = h + 'px';
+  });
+  applyLang(currentLang);
+  renderFolders(); // forcer explicitement, indépendamment de applyLang
 })();
 document.getElementById('new-folder-name').addEventListener('keydown', e => { if (e.key === 'Enter') addFolder(); });
 
 // ── SERVICE WORKER (PWA) ──
+let newSWWaiting = null;
+
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('sw.js').catch(err => console.error('SW registration failed:', err));
+    navigator.serviceWorker.register('sw.js').then(reg => {
+      reg.addEventListener('updatefound', () => {
+        const newSW = reg.installing;
+        newSW.addEventListener('statechange', () => {
+          if (newSW.state === 'installed' && navigator.serviceWorker.controller) {
+            // Nouvelle version prête — afficher la bannière
+            newSWWaiting = newSW;
+            showUpdateBanner();
+          }
+        });
+      });
+    }).catch(err => console.error('SW registration failed:', err));
+
+    // Quand le SW prend le contrôle, recharger la page
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      window.location.reload();
+    });
   });
+}
+
+function showUpdateBanner() {
+  const banner = document.getElementById('update-banner');
+  document.getElementById('update-banner-text').textContent = t('updateAvailable');
+  banner.querySelector('button').textContent = t('updateReload');
+  banner.style.display = 'flex';
+  // Décaler le contenu pour que la bannière ne cache rien
+  document.querySelectorAll('.screen:not(#screen-play)').forEach(s => {
+    s.style.paddingTop = (parseInt(s.style.paddingTop || 0) + 48) + 'px';
+  });
+}
+
+function applyUpdate() {
+  if (newSWWaiting) {
+    newSWWaiting.postMessage({ type: 'SKIP_WAITING' });
+  }
 }
 </script>
 </body>
